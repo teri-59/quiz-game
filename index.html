@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz Game</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .game {
+            background: white;
+            width: 90%;
+            max-width: 600px;
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        h1 {
+            text-align: center;
+            margin-top: 0;
+        }
+
+        .info {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+
+        #question {
+            font-size: 22px;
+            margin-bottom: 20px;
+        }
+
+        .answer {
+            width: 100%;
+            padding: 15px;
+            margin: 8px 0;
+            border: 2px solid #ddd;
+            background: white;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 16px;
+            text-align: left;
+        }
+
+        .answer:hover {
+            background: #f0f0f0;
+        }
+
+        .correct {
+            background: #90ee90 !important;
+        }
+
+        .wrong {
+            background: #ff9999 !important;
+        }
+
+        #next {
+            width: 100%;
+            padding: 15px;
+            margin-top: 20px;
+            border: none;
+            border-radius: 10px;
+            background: #667eea;
+            color: white;
+            font-size: 18px;
+            cursor: pointer;
+        }
+
+        #next:hover {
+            background: #5568d8;
+        }
+
+        #result {
+            text-align: center;
+            display: none;
+        }
+
+        #restart {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 10px;
+            background: #667eea;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="game">
+
+    <div id="quiz">
+
+        <h1>🎮 QUIZ GAME</h1>
+
+        <div class="info">
+            <span id="number">ข้อ 1 / 5</span>
+            <span id="score">คะแนน: 0</span>
+        </div>
+
+        <div id="question"></div>
+
+        <div id="answers"></div>
+
+        <button id="next">ข้อถัดไป</button>
+
+    </div>
+
+    <div id="result">
+        <h1>🎉 จบเกม!</h1>
+
+        <h2 id="finalScore"></h2>
+
+        <button id="restart">เล่นอีกครั้ง</button>
+    </div>
+
+</div>
+
+<script>
+
+    // ==========================
+    // ข้อมูลคำถาม
+    // ==========================
+
+    const questions = [
+        {
+            question: "คนชื่อไรหล่อที่สุด?",
+            answers: [
+                "เต้อ",
+                "ตอง",
+                "เทล",
+                "ม่อน"
+            ],
+            correct: 0
+        },
+
+        {
+            question: "1 + 1 เท่ากับเท่าไร?",
+            answers: [
+                "1",
+                "2",
+                "3",
+                "4"
+            ],
+            correct: 1
+        },
+
+        {
+            question: "ไก่กับไข่ คนเล่นอ่านทำไม?",
+            answers: [
+                "เรื่องของกู",
+                "อยากอ่าน",
+                "เหงา",
+                "โทดคับพรี่"
+            ],
+            correct: 0
+        },
+
+        {
+            question: "หมู หมา กา ไก่ อะไรเป็นหมา?",
+            answers: [
+                "หมา",
+                "คนเขียนโค้ด",
+                "มึงไง",
+                "งงดิ"
+            ],
+            correct: 2
+        },
+
+        {
+            question: "ยามเหงามีหน้าที่หลักอะไร?",
+            answers: [
+                "เฝ้ารากมะม่วง",
+                "ดูเวลาเหงา",
+                "เดินตรวจ",
+                "ส่งเเก๊ส"
+            ],
+            correct: 1
+        }
+    ];
+
+
+    // ==========================
+    // ตัวแปรเกม
+    // ==========================
+
+    let currentQuestion = 0;
+    let score = 0;
+    let answered = false;
+
+
+    // ==========================
+    // แสดงคำถาม
+    // ==========================
+
+    function showQuestion() {
+
+        answered = false;
+
+        const q = questions[currentQuestion];
+
+        document.getElementById("number").textContent =
+            `ข้อ ${currentQuestion + 1} / ${questions.length}`;
+
+        document.getElementById("score").textContent =
+            `คะแนน: ${score}`;
+
+        document.getElementById("question").textContent =
+            q.question;
+
+        const answersDiv = document.getElementById("answers");
+
+        answersDiv.innerHTML = "";
+
+
+        q.answers.forEach((answer, index) => {
+
+            const button = document.createElement("button");
+
+            button.textContent =
+                `${String.fromCharCode(65 + index)}. ${answer}`;
+
+            button.classList.add("answer");
+
+            button.onclick = function () {
+                checkAnswer(button, index);
+            };
+
+            answersDiv.appendChild(button);
+        });
+    }
+
+
+    // ==========================
+    // ตรวจคำตอบ
+    // ==========================
+
+    function checkAnswer(button, selected) {
+
+        if (answered) return;
+
+        answered = true;
+
+        const correct = questions[currentQuestion].correct;
+
+        const buttons =
+            document.querySelectorAll(".answer");
+
+
+        if (selected === correct) {
+
+            button.classList.add("correct");
+
+            score++;
+
+            document.getElementById("score").textContent =
+                `คะแนน: ${score}`;
+
+        } else {
+
+            button.classList.add("wrong");
+
+            buttons[correct].classList.add("correct");
+        }
+    }
+
+
+    // ==========================
+    // ข้อถัดไป
+    // ==========================
+
+    document.getElementById("next").onclick = function () {
+
+        if (!answered) {
+            alert("กรุณาเลือกคำตอบก่อน");
+            return;
+        }
+
+        currentQuestion++;
+
+        if (currentQuestion < questions.length) {
+
+            showQuestion();
+
+        } else {
+
+            document.getElementById("quiz").style.display = "none";
+
+            document.getElementById("result").style.display = "block";
+
+            document.getElementById("finalScore").textContent =
+                `คุณได้ ${score} / ${questions.length} คะแนน`;
+        }
+    };
+
+
+    // ==========================
+    // เล่นใหม่
+    // ==========================
+
+    document.getElementById("restart").onclick = function () {
+
+        currentQuestion = 0;
+        score = 0;
+
+        document.getElementById("quiz").style.display = "block";
+
+        document.getElementById("result").style.display = "none";
+
+        showQuestion();
+    };
+
+
+    // เริ่มเกม
+    showQuestion();
+
+</script>
+
+</body>
+</html>
