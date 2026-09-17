@@ -43,7 +43,16 @@
 
         #question {
             font-size: 22px;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
+        }
+
+        /* ตกแต่งรูปภาพคำถาม */
+        .question-img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            display: block;
         }
 
         .answer {
@@ -118,6 +127,9 @@
 
         <div id="question"></div>
 
+        <!-- เพิ่มพื้นที่สำหรับแสดงรูปภาพคำถาม -->
+        <div id="question-image-container"></div>
+
         <div id="answers"></div>
 
         <button id="next">ข้อถัดไป</button>
@@ -137,61 +149,66 @@
 <script>
 
     // ==========================
-    // ข้อมูลคำถาม
+    // ข้อมูลคำถาม (ใส่รูปภาพในรูปแบบ String)
     // ==========================
 
     const questions = [
-        {
-            question: "คนชื่อไรหล่อที่สุด?",
+        {   
+            question: "คนนี้สวยเหมือนอะไร?",
+            image: "pic1/a16.jpg", // ✅ เก็บรูปเป็น String path
             answers: [
-                "เต้อ",
-                "ตอง",
-                "เทล",
-                "ม่อน"
-            ],
-            correct: 0
-        },
-
-        {
-            question: "1 + 1 เท่ากับเท่าไร?",
-            answers: [
-                "1",
-                "2",
-                "3",
-                "4"
+                "เจ้าหญิง",
+                "กอลิล่า",
+                "ลิง",
+                "ฮิปโป"
             ],
             correct: 1
         },
 
         {
-            question: "ไก่กับไข่ คนเล่นอ่านทำไม?",
+            question: "คิดว่าคนนี้ขี้น้อยใจLevelไหน?",
+            image: "pic1/a17.jpg",
             answers: [
-                "เรื่องของกู",
-                "อยากอ่าน",
-                "เหงา",
-                "โทดคับพรี่"
+                "10",
+                "100",
+                "0.1",
+                "ใจดี"
+            ],
+            correct: 1
+        },
+
+        {
+            question: "คิดว่าคนนี้ขี้บ่นLevelไหน?",
+            image: "pic1/a18.jpg",
+            answers: [
+                "100",
+                "10",
+                "ไม่บ่นรับฟังทุกเรื่อง",
+                "ไม่บ่นรักแฟน"
             ],
             correct: 0
         },
 
         {
-            question: "หมู หมา กา ไก่ อะไรเป็นหมา?",
+            question: "คนนี้ตามใจมั้ย?",
+            image: "pic1/a20.jpg",
             answers: [
-                "หมา",
-                "คนเขียนโค้ด",
-                "มึงไง",
-                "งงดิ"
+                "10",
+                "50",
+                "100",
+                "เอาแต่ใจ"
             ],
             correct: 2
         },
 
         {
-            question: "ยามเหงามีหน้าที่หลักอะไร?",
+            question: "คิดว่าคนนี้น่ารักมั้ย?",
+            image: "pic1/a19.jpg",
             answers: [
-                "เฝ้ารากมะม่วง",
-                "ดูเวลาเหงา",
-                "เดินตรวจ",
-                "ส่งเเก๊ส"
+                "ไม่เท่าไหร่",
+                "น่ารักตามใจระดับ100",
+                "ไม่ งั้นๆ ",
+                "เหมือนลิงส่งกล้วย"
             ],
             correct: 1
         }
@@ -225,6 +242,18 @@
 
         document.getElementById("question").textContent =
             q.question;
+
+        // ดึง Container รูปภาพมาจัดการ
+        const imgContainer = document.getElementById("question-image-container");
+        imgContainer.innerHTML = ""; // ล้างรูปเก่าออกก่อน
+
+        // ตรวจสอบว่าข้อนี้มีรูปภาพหรือไม่
+        if (q.image) {
+            const img = document.createElement("img");
+            img.src = q.image;
+            img.classList.add("question-img");
+            imgContainer.appendChild(img);
+        }
 
         const answersDiv = document.getElementById("answers");
 
